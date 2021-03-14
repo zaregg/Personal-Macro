@@ -9,7 +9,9 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 
 AHI := new AutoHotInterception()
 id1 := AHI.GetKeyboardId(0x05AC, 0x0221, 1)
-cm1 := AHI.CreateContextManager(id1)
+id2 := AHI.GetKeyboardIdFromHandle("HID\UVHID&Col04", 1)
+kb1 := AHI.CreateContextManager(id1)
+kb2 := AHI.CreateContextManager(id2)
 
 IfNotExist, ./config
     FileCreateDir, ./config
@@ -25,8 +27,17 @@ Open(Program)
         WinActivate, AHK_PID %pid%
     return 
 }
+#if kb2.isActive 
+Numpad2::Send #{Down}
+Numpad4::Send #+{Left}
+Numpad6::Send #+{Right}
+Numpad8::Send #{Up}
+^c::Open("Chrome.exe")
+^d::Open("C:\Users\zareg\AppData\Local\Discord\Update1.exe --processStart Discord.exe")
+^y::Run, "https://youtube.com"
+^t::Run, "https://twitch.tv"
 
-#if cm1.IsActive
+#if kb1.IsActive
 c::Open("Chrome.exe")  ; Open Chrome
 ^c::Run chrome.exe "--new-window " ; Open new window for chrome
 
