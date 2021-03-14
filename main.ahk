@@ -38,6 +38,9 @@ Numpad8::Send #{Up}
 ^t::Run, "https://twitch.tv"
 
 #if kb1.IsActive
+^+t::
+    WinGet, title
+    MsgBox, 0, Hfdk, %title%
 c::Open("Chrome.exe")  ; Open Chrome
 ^c::Run chrome.exe "--new-window " ; Open new window for chrome
 
