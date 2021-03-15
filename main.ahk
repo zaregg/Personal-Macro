@@ -7,11 +7,18 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 #Persistent
 #include <AutoHotInterception>
 
-AHI := new AutoHotInterception()
-id1 := AHI.GetKeyboardId(0x05AC, 0x0221, 1)
-id2 := AHI.GetKeyboardIdFromHandle("HID\UVHID&Col04", 1)
-kb1 := AHI.CreateContextManager(id1)
-kb2 := AHI.CreateContextManager(id2)
+#Include, Voicemeeter\Voicemeeter.ahk
+
+DetectHiddenWindows, On
+activateKeyboards() {
+    AHI := new AutoHotInterception()
+    id1 := AHI.GetKeyboardId(0x05AC, 0x0221, 1)
+    id2 := AHI.GetKeyboardIdFromHandle("HID\UVHID&Col04", 1)
+    global kb1 := AHI.CreateContextManager(id1)
+    global kb2 := AHI.CreateContextManager(id2)
+}
+
+activateKeyboards()
 
 IfNotExist, ./config
     FileCreateDir, ./config
@@ -47,6 +54,7 @@ c::Open("Chrome.exe")  ; Open Chrome
 d::Open("C:\Users\zareg\AppData\Local\Discord\Update1.exe --processStart Discord.exe") ; Open Discord
 g::Run, "https://GitHub.com" ; Open GitHub
 y::Run, "https://youtube.com" ; Open Youtube
+t::Run, "https://twitch.tv" ; Open Youtube
 
 ; Type current Project directory
 p::
@@ -71,11 +79,7 @@ IniWrite, %OldWorkingDir%, ./config/config.ini, project, dir
     IniRead, WorkingDir, ./config/config.ini, project, dir
     Run, %ComSpec% /k cd %WorkingDir% && git pull
     return
-#if kb1.IsActive and WinExist("ahk_exe VoicemeeterMacroButtons.exe")
-m::Send, {Alt down}{m}{Alt up}
-,::Send, {Alt down}{F1}{Alt up}
-.::Send, {Alt down}{F2}{Alt up}
-/::Send, {Alt down}{F3}{Alt up}
+#if
 
 ^Esc::
 	ExitApp
