@@ -46,6 +46,7 @@ c::Open("Chrome.exe")  ; Open Chrome
 
 d::Open("C:\Users\zareg\AppData\Local\Discord\Update1.exe --processStart Discord.exe") ; Open Discord
 g::Run, "https://GitHub.com" ; Open GitHub
+y::Run, "https://youtube.com" ; Open Youtube
 
 ; Type current Project directory
 p::
@@ -61,16 +62,21 @@ p::
         FileSelectFolder, WorkingDir, *%OldWorkingDir%,3
     WorkingDir := RegExReplace(WorkingDir, "\\$")
     if (WorkingDir = "") 
-        return
+        return   
     OldWorkingDir := WorkingDir
-    IniWrite, %OldWorkingDir%, ./config/config.ini, project, dir
+IniWrite, %OldWorkingDir%, ./config/config.ini, project, dir
     return
 ; Go to Dir and git pull
 !w::
     IniRead, WorkingDir, ./config/config.ini, project, dir
     Run, %ComSpec% /k cd %WorkingDir% && git pull
     return
-#if
+#if kb1.IsActive and WinExist("ahk_exe VoicemeeterMacroButtons.exe")
+m::Send, {Alt down}{m}{Alt up}
+,::Send, {Alt down}{F1}{Alt up}
+.::Send, {Alt down}{F2}{Alt up}
+/::Send, {Alt down}{F3}{Alt up}
 
 ^Esc::
 	ExitApp
+    
