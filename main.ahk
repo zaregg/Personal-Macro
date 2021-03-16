@@ -10,6 +10,8 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 #Include, Voicemeeter\Voicemeeter.ahk
 
 DetectHiddenWindows, On
+config_file:="./config/config.ini"
+
 activateKeyboards() {
     AHI := new AutoHotInterception()
     id1 := AHI.GetKeyboardId(0x05AC, 0x0221, 1)
@@ -58,12 +60,12 @@ t::Run, "https://twitch.tv" ; Open Youtube
 
 ; Type current Project directory
 p::
-    IniRead, WorkingDir, ./config/config.ini, project, dir
+    IniRead, WorkingDir, %config_file%, project, workingDir
     SendInput, %WorkingDir%
     return
 ; Set Project directory for current project
 ^w::
-    IniRead, OldWorkingDir, ./config/config.ini, project, dir
+    IniRead, OldWorkingDir, %config_file%, project, workingDir
     if OldWorkingDir = "ERROR"
         FileSelectFolder, WorkingDir, ,3
     else
@@ -72,11 +74,11 @@ p::
     if (WorkingDir = "") 
         return   
     OldWorkingDir := WorkingDir
-IniWrite, %OldWorkingDir%, ./config/config.ini, project, dir
+    IniWrite, %OldWorkingDir%, %config_file%, project, workingDir
     return
 ; Go to Dir and git pull
 !w::
-    IniRead, WorkingDir, ./config/config.ini, project, dir
+    IniRead, WorkingDir, %config_file%, project, workingDir
     Run, %ComSpec% /k cd %WorkingDir% && git pull
     return
 #if
