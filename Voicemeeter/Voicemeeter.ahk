@@ -11,7 +11,7 @@ activateKeyboards()
 
 global currentlyPlaying
 config_file:="./config/config.ini"
-toggle_soundboard := false
+global toggle_soundboard := false
 
 global voicemeeter := new VMR()
 voicemeeter.login()
@@ -22,11 +22,12 @@ voicemeeter.recorder["mode.Loop"]:=0
 LoadSounds(Gui) {
     global sound_array := []
     IniRead, SoundsDir, ./config/config.ini, voicemeeter, soundsDir 
-    Loop Files, %SoundsDir%\*.mp3, R  ; Recurse into subfolders.
+    Loop Files, %SoundsDir%\*, R  ; Recurse into subfolders.
     {
         sound_array.Push(A_LoopFileName)
         IniWrite, %A_LoopFileFullPath%, ./config/config.ini, voicemeeter-sounds, %A_LoopFileName%
-        Gui, Add, Text,, Index: %A_Index% - File: %A_LoopFileName%
+        state_bool := toggle_soundboard ? "True" : "False"
+        Gui, Add, Text,, Index: %A_Index% - File: %A_LoopFileName% - Soundboard state: %state_bool% 
     }
     if(Gui)
         Gui, show, ,Available Sounds
@@ -48,7 +49,10 @@ readINI(file, ini_section, ini_key) {
 #if kb1.IsActive and WinExist("ahk_exe voicemeeter8.exe")
     m::voicemeeter.bus[7].mute-- ; bind ctrl+M to toggle mute 0q
     ; Load new sounds
-    ^+!l::LoadSounds(true)
+    ^+!l::
+        Gui, Destroy
+        LoadSounds(true)
+        return
     ^+!s:: 
         toggle_soundboard := !toggle_soundboard
         if(toggle_soundboard){
@@ -68,8 +72,8 @@ readINI(file, ini_section, ini_key) {
             Gui, Show,, Toggle Soundboard!
             SetTimer, Destroy, 1000
             return
-        Destroy:
-            Gui, Destroy
+            Destroy:
+                Gui, Destroy
         return
     ; TODO maybe put this into a function or do it with a GUI
     #if kb1.IsActive and WinExist("ahk_exe voicemeeter8.exe") and toggle_soundboard
@@ -77,4 +81,17 @@ readINI(file, ini_section, ini_key) {
     .::PlaySound(readINI(config_file, "voicemeeter-sounds", sound_array[2]), sound_array[2])
     /::PlaySound(readINI(config_file, "voicemeeter-sounds", sound_array[3]), sound_array[3])
     RShift::PlaySound(readINI(config_file, "voicemeeter-sounds", sound_array[4]), sound_array[4])
+
+    ^+m::
+        voicemeeter.recorder.A1:=!voicemeeter.recorder.A1
+        if (voicemeeter.recorder.A1) {
+            ToolTip, Muted the recorder playback for A1 
+        }else {
+            ToolTip, Unmuted the recorder playback for A1 
+        }
+        SetTimer, RemoveToolTip, 3000
+        return
+        RemoveToolTip:
+            ToolTip
+        return
 #if
