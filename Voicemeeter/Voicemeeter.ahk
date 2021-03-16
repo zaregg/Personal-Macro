@@ -8,7 +8,7 @@ SetWorkingDir, %A_ScriptDir%
 
 DetectHiddenWindows, On
 activateKeyboards()
-
+; FIXME i dont know if all these global variables are bad and/or how to do it differently
 global currentlyPlaying
 config_file:="./config/config.ini"
 global toggle_soundboard := false
@@ -47,7 +47,15 @@ readINI(file, ini_section, ini_key) {
     return OutputVar
 }
 #if kb1.IsActive and WinExist("ahk_exe voicemeeter8.exe")
-    m::voicemeeter.bus[7].mute-- ; bind ctrl+M to toggle mute 0q
+    m::
+        voicemeeter.bus[7].mute-- ; bind ctrl+M to toggle mute 0q
+        if (!voicemeeter.bus[7].mute) {
+            ToolTip, Mic muted 
+        }else {
+            ToolTip, Mic unmuted 
+        }
+        SetTimer, RemoveToolTip, 3000
+        return
     ; Load new sounds
     ^+!l::
         Gui, Destroy
@@ -83,7 +91,7 @@ readINI(file, ini_section, ini_key) {
     RShift::PlaySound(readINI(config_file, "voicemeeter-sounds", sound_array[4]), sound_array[4])
 
     ^+m::
-        voicemeeter.recorder.A1:=!voicemeeter.recorder.A1
+        voicemeeter.recorder.A1--
         if (voicemeeter.recorder.A1) {
             ToolTip, Muted the recorder playback for A1 
         }else {
